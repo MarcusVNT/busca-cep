@@ -1,6 +1,10 @@
+import 'package:buscacep/models/cep_list_model.dart';
 import 'package:buscacep/models/cep_model.dart';
+import 'package:buscacep/pages/cards.dart';
+import 'package:buscacep/repositories/cep_hive_repository.dart';
 import 'package:buscacep/repositories/cep_repository.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class EnterPage extends StatefulWidget {
   const EnterPage({super.key});
@@ -10,10 +14,36 @@ class EnterPage extends StatefulWidget {
 }
 
 class _EnterPageState extends State<EnterPage> {
+  var result = <CepListModel>[];
+  late CepHiveRepository cepHiveRepository;
+  var cepListModel = CepListModel.vazio();
   var cepController = TextEditingController(text: "");
   bool loading = false;
   var cepModel = CepModel();
   var cepRepository = CepRepository();
+
+  List<CepListModel> results = [];
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    obterDados();
+  }
+
+  void obterDados() async {
+    cepHiveRepository = await CepHiveRepository.load();
+    final dados = cepHiveRepository.obterDados();
+    if (dados.isNotEmpty) {
+      setState(() {
+        cepListModel = dados.first;
+        cepController.text = cepListModel.cep!;
+      });
+    }
+    setState(() {
+      cepController.text = "";
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,13 +59,20 @@ class _EnterPageState extends State<EnterPage> {
             ),
             body: SingleChildScrollView(
               padding:
-                  const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+                  const EdgeInsets.symmetric(horizontal: 12.0, vertical: 160.0),
               child: ConstrainedBox(
                 constraints: BoxConstraints(
                   minHeight: MediaQuery.of(context).size.height,
                   minWidth: MediaQuery.of(context).size.width,
                 ),
                 child: Column(children: [
+                  Text(
+                    "Digite o CEP para buscar o endereço:",
+                    style: GoogleFonts.poppins(fontSize: 18),
+                  ),
+                  const SizedBox(
+                    height: 24,
+                  ),
                   TextField(
                     keyboardType: TextInputType.number,
                     controller: cepController,
@@ -44,6 +81,9 @@ class _EnterPageState extends State<EnterPage> {
                       labelText: 'Digite o CEP',
                       hintText: 'Ex: 12345678',
                     ),
+                  ),
+                  const SizedBox(
+                    height: 10,
                   ),
                   ElevatedButton(
                     onPressed: () async {
@@ -65,36 +105,46 @@ class _EnterPageState extends State<EnterPage> {
                           ),
                         );
                       }
+
+                      final result = CepListModel.create(
+                          cepModel.cep,
+                          cepModel.addressName,
+                          cepModel.district,
+                          cepModel.city,
+                          cepModel.state,
+                          cepModel.ddd,
+                          cepListModel.date);
+
+                      await cepHiveRepository.save(result);
+
+                      results.add(result);
+
+                      setState(() {
+                        cepController.text = "";
+                      });
+
+                      Future.delayed(const Duration(milliseconds: 2), () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const AddressCard()));
+                      });
                     },
                     child: const Text('Buscar'),
                   ),
                   const SizedBox(
-                    height: 48,
+                    height: 24,
                   ),
-                  if (loading) CircularProgressIndicator(),
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width,
-                    child: Text(
-                      "Logradouro: ${cepModel.address}",
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 12,
-                  ),
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width,
-                    child: Text(
-                      "Cidade: ${cepModel.city} - ${cepModel.state}",
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
+                  ElevatedButton(
+                      onPressed: () {
+                        Future.delayed(const Duration(milliseconds: 2), () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const AddressCard()));
+                        });
+                      },
+                      child: const Text("Ver CEPs Buscados Anteriormente")),
                 ]),
               ),
             )));

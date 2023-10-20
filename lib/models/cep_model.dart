@@ -24,37 +24,37 @@ class CepModel {
       String? cityIbge,
       String? ddd}) {
     if (cep != null) {
-      this._cep = cep;
+      _cep = cep;
     }
     if (addressType != null) {
-      this._addressType = addressType;
+      _addressType = addressType;
     }
     if (addressName != null) {
-      this._addressName = addressName;
+      _addressName = addressName;
     }
     if (address != null) {
-      this._address = address;
+      _address = address;
     }
     if (state != null) {
-      this._state = state;
+      _state = state;
     }
     if (district != null) {
-      this._district = district;
+      _district = district;
     }
     if (lat != null) {
-      this._lat = lat;
+      _lat = lat;
     }
     if (lng != null) {
-      this._lng = lng;
+      _lng = lng;
     }
     if (city != null) {
-      this._city = city;
+      _city = city;
     }
     if (cityIbge != null) {
-      this._cityIbge = cityIbge;
+      _cityIbge = cityIbge;
     }
     if (ddd != null) {
-      this._ddd = ddd;
+      _ddd = ddd;
     }
   }
 
@@ -96,18 +96,18 @@ class CepModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['cep'] = this._cep;
-    data['address_type'] = this._addressType;
-    data['address_name'] = this._addressName;
-    data['address'] = this._address;
-    data['state'] = this._state;
-    data['district'] = this._district;
-    data['lat'] = this._lat;
-    data['lng'] = this._lng;
-    data['city'] = this._city;
-    data['city_ibge'] = this._cityIbge;
-    data['ddd'] = this._ddd;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['cep'] = _cep;
+    data['address_type'] = _addressType;
+    data['address_name'] = _addressName;
+    data['address'] = _address;
+    data['state'] = _state;
+    data['district'] = _district;
+    data['lat'] = _lat;
+    data['lng'] = _lng;
+    data['city'] = _city;
+    data['city_ibge'] = _cityIbge;
+    data['ddd'] = _ddd;
     return data;
   }
 }
